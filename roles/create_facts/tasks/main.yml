@@ -1,0 +1,16 @@
+---
+#
+#       tasks for set_facts
+#
+
+# list of facts
+
+- name: Create fact for managing VQFX
+  set_fact:
+    vqfx_list: "{{ vqfx_list | default ([]) + [{ 'name':item.0.name, 'vm_id':item.0.vm_id, 'host_ip':hostvars[item.1].ansible_host, 'console_port':'40''%02d'|format(item.0.vm_id), 'mgt_ip':'192.168.222.1''%02d'|format(item.0.vm_id), 'host_id':item.0.host_id }] }}"
+  with_nested:
+    - "{{ topology.instances }}"
+    - "{{ groups.kvm_host }}"
+  when: '"vqfx" in item.0.flavor and hostvars[item.1].id == item.0.host_id'
+  delegate_to: 127.0.0.1
+  run_once: yes

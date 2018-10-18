@@ -1,0 +1,75 @@
+#
+# Location of vQFX base images
+# 
+vqfx_download_url: http://10.84.5.120/cs-shared/images/vqfx/
+vqfxre_image_name: vqfx-re.qcow2
+vqfxpfe_image_name: vqfx-pfe.qcow2
+
+#
+# Direct access from Cloud:
+# os_download_url: https://cloud.centos.org/centos/7/images/
+#
+os_download_url: http://10.84.5.120/cs-customer/images
+os_image_name: CentOS-7-x86_64-GenericCloud-1710.qcow2
+
+#
+#    Definition of the topology
+#
+#    topology.networks   = virtual networks
+#            .instances  = virtual machines
+#            .flavors    = flavors for VMs
+#
+#    Semantic for topology.networks
+#
+#       topology.networks:
+#         "virtual_network_name":
+#           vni: vxlan vni (mandatory)
+#           ip_subnet: unused so far
+#
+
+topology:
+  networks:
+# Hardcoded management Virtual Network
+    - name: br-int  
+    - name: br-s1-xe0
+    - name: br-s1-xe1
+
+#
+#    Semantic for topology.instances
+#
+#    Define Virtual Machine instances with the following structure:
+#
+#      name: VM-NAME:           ---> Name of the instances (must be unique)
+#      vm_id: VM-ID             ---> Two-digit vm-id unique vm-id
+#                                    It is used for interface names, telnet console port, MAC and Management IP 
+#      host_id: HOST-ID         ---> HOST-ID (0-99) is the id defined in the inventory "hostname ansible_host=X.Y.Z.W id=HOST-ID" 
+#                                    this defines the host on which the VM will be spawned
+#      flavor: fl-vmx-nested    ---> Flavor defined in topology.vms.flavors (identified by names vmx / comp / cont ...)
+#      interfaces:              ---> List of interfaces
+#        management:            ---> Mapping of Management interface to libvirt network
+#          - default                     Interface naming is vm-VM_ID-mgt
+#        user:                  ---> Mapping of data plane interfaces 
+#          0: network1                   Interface naming is vm-VM_ID-eth-Index, where index is define in the below mapping 
+#          1: network2                   (e.g. 1: network2 has interface vm-01-eth-01 ) 
+#          2: network3                   Note that on VMX starting indexing from 0 maps index X to ge-0/0/X
+#          etc.
+#
+#
+            
+  instances:
+    - name: vqfx1
+      vm_id: 01
+      host_id: 1
+      flavor: fl-vqx-nested
+      interfaces:
+        management: management
+        user:  #name vm-Id_VM-eth-Id_IF # vm-00-eth-02
+          0: br-int
+          1: br-s1-xe0
+          2: br-s1-xe1
+
+  flavors:
+    fl-vqx-nested:
+      vcpus: 4
+      ram: 16
+      disk: 20

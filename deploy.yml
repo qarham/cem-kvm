@@ -1,0 +1,10 @@
+---
+
+# Install packages + common, create vQFX and configure
+
+- hosts: kvm_host
+  roles:
+     - create_facts
+     - server_install
+     - define_vqfxs
+#     - vqfx_config
